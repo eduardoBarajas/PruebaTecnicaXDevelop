@@ -4,7 +4,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const { Sequelize } = require('sequelize');
+const configDB = require('./db/configuration');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -40,17 +40,9 @@ app.use(function (err, req, res, next) {
 });
 
 // creamos la conexion a la base de datos
-const init = async () => {
-  const sequelize = new Sequelize(`postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PWD}@${process.env.POSTGRES_ADDR}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`) // Example for postgres
+(async () => {
+  configDB();
+})();
 
-  try {
-    await sequelize.authenticate();
-    console.log('La conexion a la bd fue exitosa.');
-  } catch (err) {
-    console.error('No se pudo conectar a la base de datos:', err);
-  }
-}
-
-init();
 
 module.exports = app;
