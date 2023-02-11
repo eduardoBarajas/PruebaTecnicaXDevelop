@@ -1,8 +1,10 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const { Sequelize } = require('sequelize');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,17 +20,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -37,5 +38,19 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// creamos la conexion a la base de datos
+const init = async () => {
+  const sequelize = new Sequelize(`postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PWD}@${process.env.POSTGRES_ADDR}:${process.env.POSTGRES_PORT}/${process.env.POSTGRES_DB}`) // Example for postgres
+
+  try {
+    await sequelize.authenticate();
+    console.log('La conexion a la bd fue exitosa.');
+  } catch (err) {
+    console.error('No se pudo conectar a la base de datos:', err);
+  }
+}
+
+init();
 
 module.exports = app;
