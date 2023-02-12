@@ -42,74 +42,99 @@
 				Agregar usuario
 			</button>
 		</div>
-		<% if (users.length===0) { %>
-			<p> No hay usuarios !!!</p>
-		<%} else { %>
 			<div class="tab-content" id="pills-tabContent">
 				<div class="tab-pane fade show active" id="pills-table" role="tabpanel"
 					aria-labelledby="pills-table-tab">
-					<table class="table table-dark">
-						<thead>
-							<tr>
-								<th scope="col">#</th>
-								<th scope="col">First</th>
-								<th scope="col">Last</th>
-								<th scope="col">Handle</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th scope="row">1</th>
-								<td>Mark</td>
-								<td>Otto</td>
-								<td>@mdo</td>
-							</tr>
-							<tr>
-								<th scope="row">2</th>
-								<td>Jacob</td>
-								<td>Thornton</td>
-								<td>@fat</td>
-							</tr>
-							<tr>
-								<th scope="row">3</th>
-								<td colspan="2">Larry the Bird</td>
-								<td>@twitter</td>
-							</tr>
-						</tbody>
-					</table>
+					<div class="flex-column" style="align-items: center; display: <%= users.length>0 ? 'none' : 'flex' %>;" id="no-table-data-div">
+						<image style="width: 512px; height: 512px;" src="/images/no-data.png" />
+						<p style="font-size: 2rem; font-weight: 700;">No hay datos</p>
+					</div>
+					<div id="table-content" style="display: <%= users.length>0 ? 'block' : 'none' %>;">
+						<table class="table table-dark">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Nombre</th>
+									<th scope="col">Apellido</th>
+									<th scope="col">Email</th>
+									<th scope="col">Pass</th>
+									<th scope="col">Nombre Imagen Perfil</th>
+									<th scope="col">Imagen Perfil</th>
+									<th scope="col">Acciones</th>
+								</tr>
+							</thead>
+							<tbody id="table-body">
+								<% for(var i=0; i<users.length; i++) {%>
+									<tr id="row-user-id-<%= users[i].id %>">
+										<th scope="row"><%= users[i].id %></th>
+										<td><%= users[i].nombre %></td>
+										<td><%= users[i].apellido %></td>
+										<td><%= users[i].email %></td>
+										<td><%= users[i].pass %></td>
+										<td><%= users[i].img_perfil %></td>
+										<td><image style="width: 32px; height: 32px;" src="data:image/png;base64,<%= users[i].profile_image %>"/></td>
+										<td>
+											<div class="d-flex flex-row">
+												<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-success btn-sm btn-editar-usuario"><i class="bi bi-pencil-fill"></i> Editar</button>
+												<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-danger btn-sm btn-eliminar-usuario"><i class="bi bi-trash-fill"></i> Eliminar</button>
+												<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-info btn-sm btn-ver-mas-usuario" style="color: wheat"><i class="bi bi-search"></i> Ver Mas</button>
+											</div>
+										</td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
+					</div>
 				</div>
 				<div class="tab-pane fade" id="pills-listado" role="tabpanel" aria-labelledby="pills-listado-tab">
-					<div class="list-group">
-						<a href="#" class="list-group-item list-group-item-action active" aria-current="true">
-							<div class="d-flex w-100 justify-content-between">
-								<h5 class="mb-1">List group item heading</h5>
-								<small>3 days ago</small>
+					
+					<div class="flex-column" style="align-items: center; display: <%= users.length>0 ? 'none' : 'flex' %>;" id="no-list-data-div">
+						<image style="width: 512px; height: 512px;" src="/images/no-data.png" />
+						<p style="font-size: 2rem; font-weight: 700;">No hay datos</p>
+					</div>
+					<div class="list-group" id="list-content" style="display: <%= users.length>0 ? 'block' : 'none' %>;">
+						<% for(var i=0; i<users.length; i++) {%>
+							<div id="list-row-user-id-<%= users[i].id %>" style="position: relative;">
+								<div style="z-index: 3; position:absolute; top: 8px; right: 0;">
+									<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-success btn-sm btn-editar-usuario"><i
+											class="bi bi-pencil-fill"></i> Editar</button>
+									<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-danger btn-sm btn-eliminar-usuario"><i
+											class="bi bi-trash-fill"></i> Eliminar</button>
+									<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-info btn-sm btn-ver-mas-usuario"
+										style="color: wheat"><i class="bi bi-search"></i> Ver Mas</button>
+								</div>
+								<image style="z-index: 3; position:absolute; top: 48px; right: 16px; width: 64px; height: 64px; border-radius: 64px;"
+										src="data:image/png;base64,<%= users[i].profile_image %>" />
+								<a href="#" class="list-group-item list-group-item-action text-light bg-dark" aria-current="true">
+									<div class="d-flex w-100 justify-content-between">
+										<h5>
+											<%= users[i].nombre %> <%= users[i].apellido %>
+										</h5>
+									</div>
+									<div class="d-flex flex-row w-100 justify-content-between">
+										<div class="d-flex flex-column w-25 justify-content-between">
+											<p style="font-size: 1.2rem; font-weight: 700;">ID</p>
+											<p><%= users[i].id %></p>
+										</div>
+										<div class="d-flex flex-column w-50 justify-content-between">
+											<p style="font-size: 1.2rem; font-weight: 700;">Email</p>
+											<p><%= users[i].email %></p>
+										</div>
+										<div class="d-flex flex-column w-100 justify-content-between">
+											<p style="font-size: 1.2rem; font-weight: 700;">Hashed Pass</p>
+											<p><%= users[i].pass %></p>
+										</div>
+										<div class="d-flex flex-column w-100 justify-content-between">
+											<p style="font-size: 1.2rem; font-weight: 700;">Nombre Imagen</p>
+											<p><%= users[i].img_perfil %></p>
+										</div>
+									</div>
+								</a>
 							</div>
-							<p class="mb-1">Some placeholder content in a paragraph.</p>
-							<small>And some small print.</small>
-						</a>
-						<a href="#" class="list-group-item list-group-item-action">
-							<div class="d-flex w-100 justify-content-between">
-								<h5 class="mb-1">List group item heading</h5>
-								<small class="text-muted">3 days ago</small>
-							</div>
-							<p class="mb-1">Some placeholder content in a paragraph.</p>
-							<small class="text-muted">And some muted small print.</small>
-						</a>
-						<a href="#" class="list-group-item list-group-item-action">
-							<div class="d-flex w-100 justify-content-between">
-								<h5 class="mb-1">List group item heading</h5>
-								<small class="text-muted">3 days ago</small>
-							</div>
-							<p class="mb-1">Some placeholder content in a paragraph.</p>
-							<small class="text-muted">And some muted small print.</small>
-						</a>
+						<% } %>
 					</div>
 				</div>
 			</div>
-		<% } %>
-		<button type="button" class="btn btn-primary" id="liveToastBtn">Show live toast</button>
-
 		<div id="modal-form-user" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false"
 			tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 			<div class="modal-dialog">
@@ -127,7 +152,7 @@
 							</div>
 							<div class="col-md-6">
 								<label for="form-user-lastname" class="form-label">Apellido(s)</label>
-								<input id="form-user-lastname" type="text" class="form-control" placeholder="Apellido(s)" aria-label="Apellidos">
+								<input id="form-user-lastname" type="text" class="form-control" placeholder="Apellido(s)" aria-label="Apellido(s)">
 							</div>
 							<div class="col-md-6">
 								<label for="form-user-email" class="form-label">Email</label>
@@ -143,6 +168,7 @@
 							<div class="mb-3">
 								<label for="form-user-profile-img" class="form-label">Imagen de perfil</label>
 								<input name="user-profile-img" accept="image/png,image/jpg,image/jpeg" class="form-control form-control-sm" id="form-user-profile-img" type="file">
+								<image style="width: 60%; border-radius: 32px; margin-left: 20%; margin-top: 32px;" id="img-preview-user-form" />
 							</div>
 						</form>
 					</div>
@@ -150,6 +176,24 @@
 						<button type="button" class="btn btn-secondary"
 							data-bs-dismiss="modal">Cerrar</button>
 						<button id="btn-save-modal-form-user" type="button" class="btn btn-success">Guardar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="modal-confirm" aria-hidden="true" aria-labelledby="modal-confirm"
+			tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content bg-dark">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modal-confirm-title"></h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" id="modal-confirm-body">
+						
+					</div>
+					<div class="modal-footer">
+						<button id="btn-cancel-modal" type="button" class="btn btn-secondary">Cancelar</button>
+						<button id="btn-confirm-modal" type="button" class="btn btn-success">Confirmar</button>
 					</div>
 				</div>
 			</div>

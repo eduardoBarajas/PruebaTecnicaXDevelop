@@ -1,3 +1,11 @@
+const VALIDATE_EMAIL_REGEX = /^\S+@\S+\.\S+$/;
+
+const btn_breadcrumb_inicio = document.getElementById('id-btn-breadcrumb-inicio');
+btn_breadcrumb_inicio.onclick = (ev) => {
+    window.history.back();
+}
+
+
 function Toast(status, title, message) {
     const toast = new bootstrap.Toast(document.getElementById('toast'));
     const toast_header = document.getElementById('toast-header');

@@ -28,3 +28,30 @@ a {
   height: 100%;
   padding: 64px;
 }
+
+.nav-pills .nav-link.active {
+  color: white;
+  background-color: #198754;
+}
+
+.user-info-container {
+  margin-top: 10vh;
+  margin-left: 25vw;
+  width: 50vw;
+  background-color: #4527A0;
+  border-radius: 64px;
+}
+
+.user-info-header {
+  width: 100%;
+  height: 120px;
+  padding: 32px;
+  background-color: #6200EA;
+  border-top-left-radius: 64px;
+  border-top-right-radius: 64px;
+}
+
+.user-info-body {
+  width: 100%;
+  padding: 32px;
+}
