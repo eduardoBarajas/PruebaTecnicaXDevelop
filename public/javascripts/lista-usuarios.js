@@ -65,9 +65,6 @@ window.addEventListener('load', function () {
         if (['CREATE', 'UPDATE'].includes(btn_confirm_modal.getAttribute('data-action'))) {
             modal_form_user.toggle();
         }
-        const row = document.getElementById('row-user-id-9');
-        console.log(row);
-        row.remove();
     }
 
     btn_confirm_modal.onclick = (ev) => {
