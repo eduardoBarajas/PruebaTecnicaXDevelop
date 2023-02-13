@@ -42,7 +42,7 @@ const UsersService = {
                         } else {
                             if (user.dataValues.img_perfil) {
                                 // si se actualizo el email pero no la imagen entonces tenemos que renombrar la imagen que ya se tiene para no perder la referencia.
-                                image_result = await ImageUtils.renameImage(user.dataValues.img_perfil, `${`${body.email}`.replaceAll('.', '_')}.${`${user.dataValues.img_perfil}`.split('.')[1]}`);
+                                image_result = await ImageUtils.renameImage(user.dataValues.img_perfil, `${`${body.email}`.replace(/\./g, '_')}.${`${user.dataValues.img_perfil}`.split('.')[1]}`);
                                 if (image_result.err) {
                                     response.setResponse(500, 'error', `${image_result.err.toString()}`);
                                 }
