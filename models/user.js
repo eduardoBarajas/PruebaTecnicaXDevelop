@@ -22,7 +22,7 @@ const User = sequelize.define('User', {
     },
     img_perfil: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     pass: {
         type: DataTypes.STRING,

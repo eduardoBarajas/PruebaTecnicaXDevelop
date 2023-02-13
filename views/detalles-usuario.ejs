@@ -37,25 +37,34 @@
             </div>
         </div>
         <div class="user-info-body">
-            <div class="d-flex flex-row" style="justify-content: space-between;">
-                <div style="max-width: 256px;">
-                    <image style="width: 256px; height: 256px;" src="data:image/png;base64,<%= user.profile_image %>" />
+            <% if(user){ %>
+                <div class="d-flex flex-row" style="justify-content: space-between;">
+                    <div style="max-width: 256px;">
+                        <% if(user.img_perfil){ %>
+                            <image style="width: 256px; height: 256px;" src="data:image/png;base64,<%= user.profile_image %>" />
+                        <% } else{ %>
+                            <image style="width: 256px; height: 256px;" src="/images/no-profile.png" />
+                        <% } %>
+                    </div>
+                    <div class="d-flex flex-column" style="width: 100%; padding: 32px;">
+                        <div class="d-flex flex-column">
+                            <h5 style="font-weight: 700; font-size: 1.7rem;">Email</h5>
+                            <p><%= user.email %></p>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <h5 style="font-weight: 700; font-size: 1.7rem;">Pass</h5>
+                            <p><%= user.pass %></p>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <h5 style="font-weight: 700; font-size: 1.7rem;">Nombre imagen</h5>
+                            <p><%= user.img_perfil %></p>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex flex-column" style="width: 100%; padding: 32px;">
-                    <div class="d-flex flex-column">
-                        <h5 style="font-weight: 700; font-size: 1.7rem;">Email</h5>
-                        <p><%= user.email %></p>
-                    </div>
-                    <div class="d-flex flex-column">
-                        <h5 style="font-weight: 700; font-size: 1.7rem;">Pass</h5>
-                        <p><%= user.pass %></p>
-                    </div>
-                    <div class="d-flex flex-column">
-                        <h5 style="font-weight: 700; font-size: 1.7rem;">Nombre imagen</h5>
-                        <p><%= user.img_perfil %></p>
-                    </div>
-                </div>
-            </div>
+            <% } else{ %>
+                <image style="width: 350px; height: 350px; margin-left: calc(50% - 175px);" src="/images/no-data.png" />
+                <p style="margin-left: calc(50% - 100px); width: 200px; font-size: 2rem; font-weight: 700;">No hay datos</p>
+            <% } %>
         </div>
     </div>
     <%- include ./partials/toast.ejs %>

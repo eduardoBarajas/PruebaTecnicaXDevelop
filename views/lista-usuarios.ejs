@@ -72,7 +72,13 @@
 										<td><%= users[i].email %></td>
 										<td><%= users[i].pass %></td>
 										<td><%= users[i].img_perfil %></td>
-										<td><image style="width: 32px; height: 32px;" src="data:image/png;base64,<%= users[i].profile_image %>"/></td>
+										<td>
+											<% if(users[i].img_perfil){ %>
+												<image style="width: 32px; height: 32px;" src="data:image/png;base64,<%= users[i].profile_image %>" />
+											<% } else{ %>
+												<image style="width: 32px; height: 32px;" src="/images/no-profile.png" />
+											<% } %>
+										</td>
 										<td>
 											<div class="d-flex flex-row">
 												<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-success btn-sm btn-editar-usuario"><i class="bi bi-pencil-fill"></i> Editar</button>
@@ -103,8 +109,14 @@
 									<button type="button" data-id-usuario="<%= users[i].id %>" class="mx-2 btn btn-info btn-sm btn-ver-mas-usuario"
 										style="color: wheat"><i class="bi bi-search"></i> Ver Mas</button>
 								</div>
-								<image style="z-index: 3; position:absolute; top: 48px; right: 16px; width: 64px; height: 64px; border-radius: 64px;"
+								<% if(users[i].img_perfil){ %>
+									<image style="z-index: 3; position:absolute; top: 48px; right: 16px; width: 64px; height: 64px; border-radius: 64px;"
 										src="data:image/png;base64,<%= users[i].profile_image %>" />
+								<% } else{ %>
+									<image style="z-index: 3; position:absolute; top: 48px; right: 16px; width: 64px; height: 64px; border-radius: 64px;"
+										src="/images/no-profile.png" />
+								<% } %>
+								
 								<a href="#" class="list-group-item list-group-item-action text-light bg-dark" aria-current="true">
 									<div class="d-flex w-100 justify-content-between">
 										<h5>

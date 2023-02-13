@@ -38,7 +38,7 @@ const ImageUtils = {
         try {
             // si old_name no es null signfica que es una actualizacion asi que se elimina
             if (old_name) {
-                await removeOldImage(old_name);
+                await this.removeOldImage(old_name);
             }
             const curated_data = base64Image.replace(/^data:image\/\w+;base64,/, "");
             const imageBuffer = new Buffer.from(curated_data, 'base64');

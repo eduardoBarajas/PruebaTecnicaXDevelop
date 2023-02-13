@@ -51,6 +51,7 @@ window.addEventListener('load', function () {
         clearUserForm();
         modal_form_user_title.innerText = 'Nuevo usuario';
         btn_save_modal_form_user.setAttribute('data-action', 'CREATE');
+        fillUserForm(null, true);
         modal_form_user.toggle();
     }
 
@@ -164,7 +165,7 @@ window.addEventListener('load', function () {
             }
             case 'CREATE': {
                 const invalid_form_fields = [];
-                const form_fields = ['nombre', 'apellido', 'pass', 'email', 'form_user_profile_img_name', 'form_user_profile_img_extension'];
+                const form_fields = ['nombre', 'apellido', 'pass', 'email'];
                 form_fields.forEach(field => {
                     switch (field) {
                         case 'email': {
@@ -186,15 +187,13 @@ window.addEventListener('load', function () {
                     modal_form_user.toggle();
                     return;
                 }
-                const reader = new FileReader();
-                reader.onloadend = function async() {
-                    form_data.form_user_profile_img = reader.result;
+                const execute_create = (form, image_base_64) => {
                     fetch('/users/create', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(form_data)
+                        body: JSON.stringify({ ...form, form_user_profile_img: image_base_64})
                     })
                         .then(response => response.json())
                         .then(res => {
@@ -220,7 +219,15 @@ window.addEventListener('load', function () {
                             Toast('error', 'Ocurrio un problema con el servidor', err.toString());
                         });
                 }
-                reader.readAsDataURL(form_user_profile_image.files[0]);
+                if (form_user_profile_image.files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onloadend = function async() {
+                        execute_create({ ...form_data }, reader.result);
+                    }
+                    reader.readAsDataURL(form_user_profile_image.files[0]);
+                } else {
+                    execute_create({ ...form_data }, null);
+                }
                 break;
             }
             case 'DELETE': {
@@ -366,12 +373,18 @@ function initActionsButtonsListeners(_modal_form, _modal_confirm) {
 }
 
 function fillUserForm(user, editable) {
-    document.getElementById('form-user-name').value = user.nombre;
-    document.getElementById('form-user-lastname').value = user.apellido;
-    document.getElementById('form-user-pass').value = user.pass;
-    document.getElementById('form-user-profile-img').value = null;
-    document.getElementById('form-user-email').value = user.email;
-    document.getElementById('img-preview-user-form').setAttribute('src', `data:image/png;base64,${user.profile_image}`);
+    if (user) {
+        document.getElementById('form-user-name').value = user.nombre;
+        document.getElementById('form-user-lastname').value = user.apellido;
+        document.getElementById('form-user-pass').value = user.pass;
+        document.getElementById('form-user-profile-img').value = null;
+        document.getElementById('form-user-email').value = user.email;
+        if (user.img_perfil) {
+            document.getElementById('img-preview-user-form').setAttribute('src', `data:image/png;base64,${user.profile_image}`);
+        } else {
+            document.getElementById('img-preview-user-form').setAttribute('src', `/images/no-profile.png`);
+        }
+    }
     if (editable) {
         document.getElementById('form-user-name').removeAttribute('disabled');
         document.getElementById('form-user-lastname').removeAttribute('disabled');
@@ -393,8 +406,12 @@ function updateEntries(user, action) {
     row_html += `<td>${user.apellido}</td>`;
     row_html += `<td>${user.email}</td>`;
     row_html += `<td>${user.pass}</td>`;
-    row_html += `<td>${user.img_perfil}</td>`;
-    row_html += `<td><image style="width: 32px; height: 32px;" src="data:image/png;base64,${user.profile_image}"/></td>`;
+    row_html += `<td>${(user.img_perfil) ? user.img_perfil : ''}</td>`;
+    if (user.img_perfil) {
+        row_html += `<td><image style="width: 32px; height: 32px;" src="data:image/png;base64,${user.profile_image}"/></td>`;
+    } else {
+        row_html += `<td><image style="width: 32px; height: 32px;" src="/images/no-profile.png"/></td>`;
+    }
     row_html += `<td><div class="d-flex flex-row"> <button type="button" data-id-usuario="${user.id}" class="mx-2 btn btn-success btn-sm btn-editar-usuario"><i class="bi bi-pencil-fill"></i> Editar</button>`;
     row_html += `<button type="button" data-id-usuario="${user.id}" class="mx-2 btn btn-danger btn-sm btn-eliminar-usuario"><i class="bi bi-trash-fill"></i> Eliminar</button><button type="button" data-id-usuario="${user.id}" class="mx-2 btn btn-info btn-sm btn-ver-mas-usuario" style="color: wheat"><i class="bi bi-search"></i> Ver Mas</button>`;
     row_html += `</div></td>`;
@@ -409,7 +426,11 @@ function updateEntries(user, action) {
     list_row_html += `style="color: wheat"><i class="bi bi-search"></i> Ver Mas</button>`;
     list_row_html += `</div>`;
     list_row_html += `<image style="z-index: 3; position:absolute; top: 48px; right: 16px; width: 64px; height: 64px; border-radius: 64px;"`;
-    list_row_html += `src="data:image/png;base64,${user.profile_image}" />`;
+    if (user.img_perfil) {
+        list_row_html += `src="data:image/png;base64,${user.profile_image}" />`;
+    } else {
+        list_row_html += `src="/images/no-profile.png" />`;
+    }
     list_row_html += `<a href="#" class="list-group-item list-group-item-action text-light bg-dark" aria-current="true">`;
     list_row_html += `<div class="d-flex w-100 justify-content-between">`;
     list_row_html += `<h5>${user.nombre} ${user.apellido}</h5>`;
@@ -429,7 +450,7 @@ function updateEntries(user, action) {
     list_row_html += `</div>`;
     list_row_html += `<div class="d-flex flex-column w-100 justify-content-between">`;
     list_row_html += `<p style="font-size: 1.2rem; font-weight: 700;">Nombre Imagen</p>`;
-    list_row_html += `<p>${user.img_perfil}</p>`;
+    list_row_html += `<p>${(user.img_perfil) ? user.img_perfil : ''}</p>`;
     list_row_html += `</div></div></a></div>`;
     
     if (action === 'CREATE') {

@@ -35,15 +35,17 @@ const UsersService = {
                         // si llega aqui el email significa que ha sido actualizado en el form, por lo que debe de cam
                         if (body.form_user_profile_img) {
                             // si llega la imagen significa que el usuario actualizo la imagen en el form
-                            image_result = await ImageUtils.saveImage(body.form_user_profile_img, body.form_user_profile_img_name, body.form_user_profile_img_extension);
+                            image_result = await ImageUtils.saveImage(body.form_user_profile_img, body.form_user_profile_img_name, body.form_user_profile_img_extension, user.dataValues.img_perfil);
                             if (image_result.err) {
                                 response.setResponse(500, 'error', `${image_result.err.toString()}`);
                             }
                         } else {
-                            // si se actualizo el email pero no la imagen entonces tenemos que renombrar la imagen que ya se tiene para no perder la referencia.
-                            image_result = await ImageUtils.renameImage(user.dataValues.img_perfil, `${body.email.replaceAll('.', '_')}.${user.dataValues.img_perfil.split('.')[1]}`);
-                            if (image_result.err) {
-                                response.setResponse(500, 'error', `${image_result.err.toString()}`);
+                            if (user.dataValues.img_perfil) {
+                                // si se actualizo el email pero no la imagen entonces tenemos que renombrar la imagen que ya se tiene para no perder la referencia.
+                                image_result = await ImageUtils.renameImage(user.dataValues.img_perfil, `${body.email.replaceAll('.', '_')}.${user.dataValues.img_perfil.split('.')[1]}`);
+                                if (image_result.err) {
+                                    response.setResponse(500, 'error', `${image_result.err.toString()}`);
+                                }
                             }
                         }
                     } else {
@@ -71,6 +73,10 @@ const UsersService = {
                 if (image_result) {
                     update_obj['img_perfil'] = image_result.img_name;
                 }
+                if (update_obj['pass']) {
+                    // si la pass fue modificada entonces ciframos la nueva contrasena
+                    update_obj.pass = await bcrypt.hash(update_obj.pass, saltRounds);
+                }
                 await User.update(update_obj, {
                     where: {
                         id: id_user
@@ -91,7 +97,7 @@ const UsersService = {
     },
     save: async (body) => {
         const response = new Response();
-        const body_fields = ['nombre', 'apellido', 'pass', 'email', 'form_user_profile_img', 'form_user_profile_img_name', 'form_user_profile_img_extension'];
+        const body_fields = ['nombre', 'apellido', 'pass', 'email'];
         // validamos el form
         let invalid_form_fields = [];
         body_fields.forEach(field => {
@@ -112,28 +118,36 @@ const UsersService = {
         if (invalid_form_fields.length > 0) {
             response.setResponse(400, 'error', `Los campos [${invalid_form_fields.join(', ')}] del formulario, son invalidos.`);
         } else {
-            const result = await ImageUtils.saveImage(body.form_user_profile_img, body.form_user_profile_img_name, body.form_user_profile_img_extension);
-            if (result.err) {
-                response.setResponse(500, 'error', `${result.err.toString()}`);
-            } else {
-                try {
-                    const hash_result = await bcrypt.hash(body.pass, saltRounds);
-                    const user = User.build({
-                        nombre: body.nombre,
-                        apellido: body.apellido,
-                        email: body.email,
-                        img_perfil: result.img_name,
-                        pass: hash_result
-                    });
-                    try {
-                        const saved_user = await user.save();
-                        response.setResponse(200, 'success', `Se registro el usuario con exito`, saved_user);
-                    } catch (err_save) {
-                        response.setResponse(500, 'error', `${err_save.toString()}`);
-                    }
-                } catch (err_hash) {
-                    response.setResponse(500, 'error', `${err_hash.toString()}`);
+            let image_result = null;
+            if (body['form_user_profile_img'] && body['form_user_profile_img_name'] && body['form_user_profile_img_extension']) {
+                // si hay imagen en el body entonces lo guardamos
+                image_result = await ImageUtils.saveImage(body.form_user_profile_img, body.form_user_profile_img_name, body.form_user_profile_img_extension);
+                if (image_result.err) {
+                    response.setResponse(500, 'error', `${image_result.err.toString()}`);
                 }
+            }
+            const user_obj = {
+                nombre: body.nombre,
+                apellido: body.apellido,
+                email: body.email,
+                img_perfil: null,
+                pass: ''
+            }
+            if (image_result && !image_result.err) {
+                // si entra aqui es que se subio una imagen sin errores
+                user_obj.img_perfil = image_result.img_name;
+            }
+            try {
+                const hash_result = await bcrypt.hash(body.pass, saltRounds);
+                const user = User.build({ ...user_obj, pass: hash_result});
+                try {
+                    const saved_user = await user.save();
+                    response.setResponse(200, 'success', `Se registro el usuario con exito`, saved_user);
+                } catch (err_save) {
+                    response.setResponse(500, 'error', `${err_save.toString()}`);
+                }
+            } catch (err_hash) {
+                response.setResponse(500, 'error', `${err_hash.toString()}`);
             }
         }
         return response.getResponse();
