@@ -2,7 +2,7 @@
 Es un servicio REST básico con NodeJS para realizar operaciones CRUD sobre una base de datos de usuarios, donde se utiliza el framework Express y el ORM Sequelize.
 
 ## Version de prueba
-La app se encuentra hospedada en una maquina virtual en Linode, para acceder a la app ingresar hacer [click aqui](https://139.144.31.231:3000/)
+La app se encuentra hospedada en una maquina virtual en Linode, para acceder a la app ingresar hacer [click aqui](http://139.144.31.231:3000/)
 
 
 ### Archivo de configuracion ENV
